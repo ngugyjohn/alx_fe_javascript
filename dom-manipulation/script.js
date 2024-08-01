@@ -62,15 +62,6 @@ function createAddQuoteForm() {
     document.body.appendChild(formContainer);
 }
 
-// Attach the event listener to the "Show New Quote" button
-document.getElementById('newQuote').addEventListener('click', showRandomQuote);
-
-// Initial display of a quote
-showRandomQuote();
-
-// Create the form for adding new quotes
-createAddQuoteForm();
-
 // Function to export quotes to a JSON file
 function exportToJsonFile() {
     const dataStr = JSON.stringify(quotes, null, 2);
@@ -95,15 +86,11 @@ function importFromJsonFile(event) {
     fileReader.readAsText(event.target.files[0]);
 }
 
-// Create export and import buttons
-const exportButton = document.createElement('button');
-exportButton.textContent = 'Export Quotes to JSON';
-exportButton.onclick = exportToJsonFile;
-document.body.appendChild(exportButton);
+// Attach the event listener to the "Show New Quote" button
+document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 
-const importInput = document.createElement('input');
-importInput.type = 'file';
-importInput.id = 'importFile';
-importInput.accept = '.json';
-importInput.onchange = importFromJsonFile;
-document.body.appendChild(importInput);
+// Initial display of a quote
+showRandomQuote();
+
+// Create the form for adding new quotes
+createAddQuoteForm();
