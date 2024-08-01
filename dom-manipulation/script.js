@@ -76,24 +76,23 @@ function filterQuotes() {
     }
 }
 
-// Function to fetch quotes from the server
-function fetchQuotesFromServer() {
-    fetch(SERVER_URL)
-        .then(response => response.json())
-        .then(serverQuotes => {
-            // Assuming serverQuotes is an array of quotes from the server
-            const serverQuotesArray = serverQuotes.map(quote => ({
-                text: quote.body, // Adjust according to the actual server data structure
-                category: quote.title // Adjust according to the actual server data structure
-            }));
-            quotes = serverQuotesArray; // Server data takes precedence
-            saveQuotes();
-            populateCategories(); // Update categories in dropdown
-            alert('Quotes have been synchronized with the server.');
-        })
-        .catch(error => {
-            console.error('Failed to fetch quotes from server:', error);
-        });
+// Async function to fetch quotes from the server
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch(SERVER_URL);
+        const serverQuotes = await response.json();
+        // Assuming serverQuotes is an array of quotes from the server
+        const serverQuotesArray = serverQuotes.map(quote => ({
+            text: quote.body, // Adjust according to the actual server data structure
+            category: quote.title // Adjust according to the actual server data structure
+        }));
+        quotes = serverQuotesArray; // Server data takes precedence
+        saveQuotes();
+        populateCategories(); // Update categories in dropdown
+        alert('Quotes have been synchronized with the server.');
+    } catch (error) {
+        console.error('Failed to fetch quotes from server:', error);
+    }
 }
 
 // Function to export quotes to a JSON file
