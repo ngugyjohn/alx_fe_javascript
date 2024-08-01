@@ -1,3 +1,6 @@
+// Mock server URL for demonstration purposes
+const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // Replace with actual API endpoint
+
 // Array to store quotes, loaded from local storage if available
 let quotes = JSON.parse(localStorage.getItem('quotes')) || [
     { text: "The only way to do great work is to love what you do.", category: "Inspiration" },
@@ -8,6 +11,7 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
 // Save quotes to local storage
 function saveQuotes() {
     localStorage.setItem('quotes', JSON.stringify(quotes));
+    syncWithServer(); // Sync with server whenever quotes are updated
 }
 
 // Function to display a random quote
@@ -73,30 +77,22 @@ function filterQuotes() {
     }
 }
 
-// Function to create the form for adding a new quote
-function createAddQuoteForm() {
-    const formContainer = document.createElement('div');
-    formContainer.id = 'addQuoteForm';
-
-    const quoteInput = document.createElement('input');
-    quoteInput.id = 'newQuoteText';
-    quoteInput.type = 'text';
-    quoteInput.placeholder = 'Enter a new quote';
-
-    const categoryInput = document.createElement('input');
-    categoryInput.id = 'newQuoteCategory';
-    categoryInput.type = 'text';
-    categoryInput.placeholder = 'Enter quote category';
-
-    const addButton = document.createElement('button');
-    addButton.textContent = 'Add Quote';
-    addButton.onclick = addQuote;
-
-    formContainer.appendChild(quoteInput);
-    formContainer.appendChild(categoryInput);
-    formContainer.appendChild(addButton);
-
-    document.body.appendChild(formContainer);
+// Function to sync local quotes with server
+function syncWithServer() {
+    fetch(SERVER_URL)
+        .then(response => response.json())
+        .then(serverQuotes => {
+            // Assuming serverQuotes is an array of quotes from the server
+            if (JSON.stringify(serverQuotes) !== JSON.stringify(quotes)) {
+                quotes = serverQuotes; // Server data takes precedence
+                saveQuotes();
+                populateCategories(); // Update categories in dropdown
+                alert('Quotes have been synchronized with the server.');
+            }
+        })
+        .catch(error => {
+            console.error('Failed to sync with server:', error);
+        });
 }
 
 // Function to export quotes to a JSON file
@@ -135,3 +131,6 @@ populateCategories();
 
 // Create the form for adding new quotes
 createAddQuoteForm();
+
+// Periodic syncing with the server
+setInterval(syncWithServer, 300000); // Sync every 5 minutes
