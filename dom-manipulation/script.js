@@ -11,7 +11,6 @@ let quotes = JSON.parse(localStorage.getItem('quotes')) || [
 // Save quotes to local storage
 function saveQuotes() {
     localStorage.setItem('quotes', JSON.stringify(quotes));
-    syncWithServer(); // Sync with server whenever quotes are updated
 }
 
 // Function to display a random quote
@@ -77,21 +76,23 @@ function filterQuotes() {
     }
 }
 
-// Function to sync local quotes with server
-function syncWithServer() {
+// Function to fetch quotes from the server
+function fetchQuotesFromServer() {
     fetch(SERVER_URL)
         .then(response => response.json())
         .then(serverQuotes => {
             // Assuming serverQuotes is an array of quotes from the server
-            if (JSON.stringify(serverQuotes) !== JSON.stringify(quotes)) {
-                quotes = serverQuotes; // Server data takes precedence
-                saveQuotes();
-                populateCategories(); // Update categories in dropdown
-                alert('Quotes have been synchronized with the server.');
-            }
+            const serverQuotesArray = serverQuotes.map(quote => ({
+                text: quote.body, // Adjust according to the actual server data structure
+                category: quote.title // Adjust according to the actual server data structure
+            }));
+            quotes = serverQuotesArray; // Server data takes precedence
+            saveQuotes();
+            populateCategories(); // Update categories in dropdown
+            alert('Quotes have been synchronized with the server.');
         })
         .catch(error => {
-            console.error('Failed to sync with server:', error);
+            console.error('Failed to fetch quotes from server:', error);
         });
 }
 
@@ -132,5 +133,8 @@ populateCategories();
 // Create the form for adding new quotes
 createAddQuoteForm();
 
+// Fetch quotes from the server on load
+fetchQuotesFromServer();
+
 // Periodic syncing with the server
-setInterval(syncWithServer, 300000); // Sync every 5 minutes
+setInterval(fetchQuotesFromServer, 300000); // Sync every 5 minutes
