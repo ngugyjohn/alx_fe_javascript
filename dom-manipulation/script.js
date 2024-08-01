@@ -90,7 +90,7 @@ async function fetchQuotesFromServer() {
         quotes = serverQuotesArray; // Server data takes precedence
         saveQuotes();
         populateCategories(); // Update categories in dropdown
-        alert('Quotes have been synchronized with the server.');
+        displayNotification('Quotes synced with server!');
     } catch (error) {
         console.error('Failed to fetch quotes from server:', error);
     }
@@ -108,7 +108,7 @@ async function postQuoteToServer(quote) {
         });
 
         if (response.ok) {
-            alert('Quote successfully posted to the server.');
+            console.log('Quote successfully posted to the server.');
         } else {
             console.error('Failed to post quote to server:', response.statusText);
         }
@@ -124,9 +124,21 @@ async function syncQuotes() {
         for (const quote of quotes) {
             await postQuoteToServer(quote); // Post each quote to the server
         }
+        displayNotification('Quotes synced with server!');
     } catch (error) {
         console.error('Error syncing quotes:', error);
     }
+}
+
+// Function to display a notification to the user
+function displayNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
 }
 
 // Function to export quotes to a JSON file
