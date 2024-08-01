@@ -35,6 +35,7 @@ function addQuote() {
         document.getElementById('newQuoteText').value = ''; // Clear the input field
         document.getElementById('newQuoteCategory').value = ''; // Clear the input field
         alert("Quote added successfully!");
+        syncQuotes(); // Sync with server after adding a new quote
     } else {
         alert("Please enter both a quote and a category.");
     }
@@ -95,6 +96,39 @@ async function fetchQuotesFromServer() {
     }
 }
 
+// Async function to post new quotes to the server
+async function postQuoteToServer(quote) {
+    try {
+        const response = await fetch(SERVER_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quote)
+        });
+
+        if (response.ok) {
+            alert('Quote successfully posted to the server.');
+        } else {
+            console.error('Failed to post quote to server:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error posting quote to server:', error);
+    }
+}
+
+// Function to synchronize quotes with the server
+async function syncQuotes() {
+    try {
+        await fetchQuotesFromServer(); // Fetch the latest quotes from the server
+        for (const quote of quotes) {
+            await postQuoteToServer(quote); // Post each quote to the server
+        }
+    } catch (error) {
+        console.error('Error syncing quotes:', error);
+    }
+}
+
 // Function to export quotes to a JSON file
 function exportToJsonFile() {
     const dataStr = JSON.stringify(quotes, null, 2);
@@ -116,6 +150,7 @@ function importFromJsonFile(event) {
         saveQuotes();
         populateCategories(); // Update categories in dropdown
         alert('Quotes imported successfully!');
+        syncQuotes(); // Sync with server after importing new quotes
     };
     fileReader.readAsText(event.target.files[0]);
 }
@@ -136,4 +171,4 @@ createAddQuoteForm();
 fetchQuotesFromServer();
 
 // Periodic syncing with the server
-setInterval(fetchQuotesFromServer, 300000); // Sync every 5 minutes
+setInterval(syncQuotes, 300000); // Sync every 5 minutes
